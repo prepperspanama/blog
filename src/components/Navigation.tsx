@@ -63,7 +63,7 @@ export default function Navigation() {
               className="font-bold text-xl flex items-center gap-3 group"
             >
               <Image
-                src="/logo.png"
+                src="/logo.webp"
                 alt="Logo Preppers Panamá"
                 width={36}
                 height={36}

@@ -48,7 +48,7 @@ export default function RootLayout({
             <div className="grid md:grid-cols-3 gap-8 mb-8">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <Image src="/logo.png" alt="Logo Preppers Panamá" width={32} height={32} className="h-8 w-auto" />
+                  <Image src="/logo.webp" alt="Logo Preppers Panamá" width={32} height={32} className="h-8 w-auto" />
                   <h3 className="text-white font-bold">Preppers Panamá</h3>
                 </div>
                 <p className="text-sm">Fomentando la resiliencia y la preparación en la República de Panamá. Tecnología, equipo y conocimiento para lo inesperado.</p>
