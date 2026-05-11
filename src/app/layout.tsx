@@ -40,10 +40,12 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <head>
+        {/* Security Headers (Meta Tag implementations for Static Sites) */}
         <meta
           httpEquiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none';"
+          content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-src 'none'; frame-ancestors 'none';"
         />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
       </head>
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
         <a
