@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
     maximumDiskCacheSize: 256 * 1024 * 1024,
   },
   trailingSlash: true,
+  experimental: {
+    sri: {
+      algorithm: 'sha384',
+    },
+  },
 };
 
 const withMDX = createMDX({});
