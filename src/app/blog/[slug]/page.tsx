@@ -22,7 +22,7 @@ export default async function PostPage({ params }: PageProps) {
   }
 
   // Dynamically import the MDX content
-  const Content = dynamic(() => import(`@/content/blog/${slug}.mdx`), {
+  const Content = dynamic(() => import(`../../../content/blog/${slug}.mdx`), {
     loading: () => <div className="animate-pulse h-96 bg-zinc-900/50 rounded-3xl" />,
   });
 
