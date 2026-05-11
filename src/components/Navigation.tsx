@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import logo from "../../public/logo.webp";
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -63,7 +64,7 @@ export default function Navigation() {
               className="font-bold text-xl flex items-center gap-3 group"
             >
               <Image
-                src="/logo.webp"
+                src={logo}
                 alt="Logo Preppers Panamá"
                 width={36}
                 height={36}
