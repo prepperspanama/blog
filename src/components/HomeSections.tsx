@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { ALL_POSTS } from "@/lib/posts"
 
 
 const pillars = [
@@ -76,6 +77,60 @@ export function PillarsSection() {
 
 
 
+
+
+
+export function BlogSection() {
+  const recentPosts = ALL_POSTS.slice(0, 2);
+
+  return (
+    <section className="py-24 bg-zinc-950">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <p className="text-cyan-600 font-mono text-xs tracking-widest uppercase mb-3">
+              Del Blog
+            </p>
+            <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight">
+              Recientes
+            </h2>
+          </div>
+          <Link
+            href="/blog"
+            className="text-zinc-500 hover:text-cyan-400 font-mono text-xs uppercase tracking-widest transition-colors mb-2"
+          >
+            Ver todos →
+          </Link>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {recentPosts.map((post) => (
+            <Link
+              key={post.slug}
+              href={`/blog/${post.slug}`}
+              className="group p-8 rounded-3xl bg-zinc-900/20 border border-zinc-800/40 hover:border-cyan-900/60 transition-all"
+            >
+              <div className="flex gap-4 mb-4">
+                <span className="text-[10px] font-mono text-cyan-500 border border-cyan-500/30 px-2 py-0.5 rounded uppercase">
+                  {post.category}
+                </span>
+                <span className="text-[10px] font-mono text-zinc-600 uppercase">
+                  {post.date}
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">
+                {post.title}
+              </h3>
+              <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2">
+                {post.excerpt}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
 export function CtaSection() {
   return (
     <section className="py-24 border-t border-zinc-800/40">

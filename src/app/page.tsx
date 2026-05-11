@@ -3,6 +3,7 @@ import dynamic from "next/dynamic"
 
 const QuoteSection = dynamic(() => import("@/components/HomeSections").then(mod => mod.QuoteSection), { ssr: true })
 const PillarsSection = dynamic(() => import("@/components/HomeSections").then(mod => mod.PillarsSection), { ssr: true })
+const BlogSection = dynamic(() => import("@/components/HomeSections").then(mod => mod.BlogSection), { ssr: true })
 const CtaSection = dynamic(() => import("@/components/HomeSections").then(mod => mod.CtaSection), { ssr: true })
 
 
@@ -49,6 +50,7 @@ export default function Home() {
       {/* ── Lazy loaded sections below the fold ──────────── */}
       <QuoteSection />
       <PillarsSection />
+      <BlogSection />
       <CtaSection />
     </div>
   )

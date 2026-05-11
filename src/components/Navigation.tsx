@@ -41,6 +41,7 @@ export default function Navigation() {
 
   const links = [
     { href: "/", label: "Inicio" },
+    { href: "/blog", label: "Blog" },
   ];
 
   const isActive = (href: string) =>
