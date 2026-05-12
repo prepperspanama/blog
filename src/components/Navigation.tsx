@@ -8,7 +8,6 @@ import logo from "../../public/logo.webp";
 
 export default function Navigation() {
   const pathname = usePathname();
-  const [tacticalMode, setTacticalMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -18,15 +17,6 @@ export default function Navigation() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  // Tactical mode body class
-  useEffect(() => {
-    if (tacticalMode) {
-      document.body.classList.add("tactical-mode");
-    } else {
-      document.body.classList.remove("tactical-mode");
-    }
-  }, [tacticalMode]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -97,31 +87,10 @@ export default function Navigation() {
                 ))}
               </ul>
 
-              {/* Tactical button */}
-              <button
-                onClick={() => setTacticalMode(!tacticalMode)}
-                className={`px-3 py-1.5 rounded border text-xs font-mono transition-all ${tacticalMode
-                  ? "bg-green-500/20 border-green-500 text-green-400 shadow-[0_0_12px_rgba(74,222,128,0.3)]"
-                  : "bg-zinc-900 border-zinc-700 text-zinc-400 hover:border-cyan-600 hover:text-cyan-400"
-                  }`}
-                aria-label="Toggle tactical mode"
-              >
-                {tacticalMode ? "● TACTICAL ON" : "○ TACTICAL"}
-              </button>
             </div>
 
-            {/* Mobile: tactical + hamburger */}
+            {/* Mobile: hamburger */}
             <div className="flex md:hidden items-center gap-3">
-              <button
-                onClick={() => setTacticalMode(!tacticalMode)}
-                className={`px-2 py-1 rounded border text-xs font-mono transition-all ${tacticalMode
-                  ? "bg-green-500/20 border-green-500 text-green-400"
-                  : "bg-zinc-900 border-zinc-700 text-zinc-400"
-                  }`}
-                aria-label="Toggle tactical mode"
-              >
-                {tacticalMode ? "●TAC" : "○TAC"}
-              </button>
 
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
