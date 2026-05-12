@@ -13,7 +13,7 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#0891b2', // cyan-600
     icons: [
       {
-        src: "/blog/logo.webp",
+        src: "/logo.webp",
         sizes: "any",
         type: "image/webp",
       },

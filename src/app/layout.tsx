@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   title: "Preppers Panamá - Preparación y Supervivencia",
   description: "Blog sobre preparacionismo, mochilas de emergencia, primeros auxilios y tecnologías de comunicación para situaciones de crisis en Panamá.",
   icons: {
-    icon: "/blog/favicon.ico",
-    apple: "/blog/logo.webp",
+    icon: "/favicon.ico",
+    apple: "/logo.webp",
   },
 };
 
