@@ -68,8 +68,9 @@ export default function RootLayout({
                 <p className="text-sm">Fomentando la resiliencia y la preparación en la República de Panamá. Tecnología, equipo y conocimiento para lo inesperado.</p>
               </div>
             </div>
-            <div className="pt-8 border-t border-zinc-800 text-center text-xs">
+            <div className="pt-8 border-t border-zinc-800 text-center text-xs space-y-1">
               <p>© 2026 Preppers Panamá. La preparación es responsabilidad de todos.</p>
+              <p>Este sitio está bajo la <a href="/license" className="text-zinc-500 hover:text-cyan-400 transition-colors">GNU General Public License v3.0</a>.</p>
             </div>
           </div>
         </footer>
