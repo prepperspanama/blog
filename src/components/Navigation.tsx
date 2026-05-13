@@ -42,6 +42,7 @@ export default function Navigation() {
   const links = [
     { href: "/", label: "Inicio" },
     { href: "/blog", label: "Blog" },
+    { href: "/mapa", label: "Mapa" },
   ];
 
   const isActive = (href: string) =>
