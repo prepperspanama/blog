@@ -53,18 +53,6 @@ interface CacheEntry {
   ts: number;
 }
 
-interface AircraftState {
-  icao24: string;
-  callsign: string;
-  origin_country: string;
-  latitude: number;
-  longitude: number;
-  altitude: number;
-  velocity: number;
-  heading: number;
-  on_ground: boolean;
-}
-
 const getLatestGoesTime = () => {
   const now = new Date();
   const date = new Date(now.getTime() - 15 * 60000);
@@ -149,29 +137,6 @@ async function fetchWeatherData(lat: number, lng: number): Promise<OpenMeteoResp
   return data;
 }
 
-async function fetchAircraft(bounds?: { lamin: number; lamax: number; lomin: number; lomax: number }): Promise<AircraftState[]> {
-  const query = bounds 
-    ? `?lamin=${bounds.lamin}&lamax=${bounds.lamax}&lomin=${bounds.lomin}&lomax=${bounds.lomax}`
-    : "";
-  const res = await fetch(`/api/aircraft${query}`);
-  if (!res.ok) throw new Error("Error al obtener datos de aviones");
-  const json = await res.json();
-  if (!json.states) return [];
-  return json.states
-    .filter((s: (number | string | boolean | null)[]) => s[5] && s[6])
-    .map((s: (number | string | boolean | null)[]) => ({
-      icao24: String(s[0]),
-      callsign: String(s[1] || "").trim(),
-      origin_country: String(s[2]),
-      latitude: Number(s[6]),
-      longitude: Number(s[5]),
-      altitude: Number(s[7]) || 0,
-      velocity: Number(s[9]) || 0,
-      heading: Number(s[10]) || 0,
-      on_ground: Boolean(s[8]),
-    }));
-}
-
 function buildPopupHtml(cityName: string, d: OpenMeteoResponse): string {
   const c = d.current;
   const day = d.daily;
@@ -243,36 +208,6 @@ function buildPopupHtml(cityName: string, d: OpenMeteoResponse): string {
   `;
 }
 
-function buildAircraftPopupHtml(a: AircraftState): string {
-  return `
-    <div style="font-family:'Inter',monospace;min-width:180px;background:#09090b;border-radius:10px;overflow:hidden;border:1px solid #27272a">
-      <div style="background:linear-gradient(135deg,#1e3a5f,#0c4a6e);padding:8px 10px 6px">
-        <div style="font-size:13px;font-weight:700;color:#fff">${a.callsign || "N/D"}</div>
-        <div style="font-size:10px;color:#93c5fd">${a.origin_country}</div>
-      </div>
-      <div style="padding:8px 10px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
-        <div style="background:#18181b;border-radius:6px;padding:5px 7px">
-          <div style="font-size:8px;color:#71717a;text-transform:uppercase">Altitud</div>
-          <div style="font-size:13px;font-weight:700;color:#60a5fa">${(a.altitude * 3.28084).toFixed(0)} ft</div>
-        </div>
-        <div style="background:#18181b;border-radius:6px;padding:5px 7px">
-          <div style="font-size:8px;color:#71717a;text-transform:uppercase">Velocidad</div>
-          <div style="font-size:13px;font-weight:700;color:#34d399">${(a.velocity * 1.94384).toFixed(0)} kn</div>
-        </div>
-        <div style="background:#18181b;border-radius:6px;padding:5px 7px">
-          <div style="font-size:8px;color:#71717a;text-transform:uppercase">Rumbo</div>
-          <div style="font-size:13px;font-weight:700;color:#fb923c">${a.heading.toFixed(0)}°</div>
-        </div>
-        <div style="background:#18181b;border-radius:6px;padding:5px 7px">
-          <div style="font-size:8px;color:#71717a;text-transform:uppercase">Estado</div>
-          <div style="font-size:12px;font-weight:700;color:${a.on_ground ? "#a1a1aa" : "#22d3ee"}">${a.on_ground ? "En tierra" : "En vuelo"}</div>
-        </div>
-      </div>
-      <div style="padding:2px 10px 6px;font-size:8px;color:#3f3f46;text-align:right">OpenSky Network</div>
-    </div>
-  `;
-}
-
 type LeafletInstance = typeof import("leaflet");
 type LeafletMap = import("leaflet").Map;
 type LeafletLayerGroup = import("leaflet").LayerGroup;
@@ -284,14 +219,12 @@ export default function GoesMap() {
   const goesLayerRef = useRef<LeafletTileLayerWMS | null>(null);
   const LRef = useRef<LeafletInstance | null>(null);
   const weatherLayerGroupRef = useRef<LeafletLayerGroup | null>(null);
-  const aircraftLayerGroupRef = useRef<LeafletLayerGroup | null>(null);
   const [activeLayer, setActiveLayer] = useState<GoesLayer>(GOES_LAYERS[0]);
   const [goesOpacity, setGoesOpacity] = useState(GOES_LAYERS[0].opacity);
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState("");
   const [mounted, setMounted] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
-  const [showAircraft, setShowAircraft] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -390,7 +323,6 @@ export default function GoesMap() {
         new FullscreenControl().addTo(map);
 
         weatherLayerGroupRef.current = L.layerGroup().addTo(map);
-        aircraftLayerGroupRef.current = L.layerGroup().addTo(map);
       } catch (error) {
         console.error("Error al inicializar el mapa:", error);
       }
@@ -404,7 +336,6 @@ export default function GoesMap() {
         mapInstanceRef.current = null;
         goesLayerRef.current = null;
         weatherLayerGroupRef.current = null;
-        aircraftLayerGroupRef.current = null;
       }
     };
   }, [mounted]);
@@ -518,92 +449,9 @@ export default function GoesMap() {
     });
   }, [showWeather, mounted]);
 
-  useEffect(() => {
-    const L = LRef.current;
-    const group = aircraftLayerGroupRef.current;
-    if (!L || !group) return;
-
-    group.clearLayers();
-    if (!showAircraft) return;
-
-    let active = true;
-
-    const loadAircraft = async () => {
-      try {
-        const map = mapInstanceRef.current;
-        let bounds;
-        if (map) {
-          const b = map.getBounds();
-          bounds = {
-            lamin: b.getSouth(),
-            lamax: b.getNorth(),
-            lomin: b.getWest(),
-            lomax: b.getEast()
-          };
-        }
-        
-        const aircraft = await fetchAircraft(bounds);
-        if (!active || !showAircraft) return;
-        group.clearLayers();
-
-        aircraft.forEach((a) => {
-          const rot = a.heading;
-          const icon = L.divIcon({
-            className: "",
-            html: `
-              <div style="position:relative;width:24px;height:24px;transform:rotate(${rot}deg);transition:transform 0.3s">
-                <div style="font-size:20px;line-height:24px;text-align:center;filter:drop-shadow(0 0 4px rgba(251,191,36,0.6))">✈️</div>
-              </div>
-            `,
-            iconSize: [24, 24],
-            iconAnchor: [12, 12],
-          });
-
-          const marker = L.marker([a.latitude, a.longitude], { icon });
-          const popup = L.popup({
-            className: "weather-popup",
-            closeButton: false,
-            maxWidth: 260,
-            offset: [0, -12],
-          }).setContent(buildAircraftPopupHtml(a));
-
-          marker.bindPopup(popup);
-
-          let pinned = false;
-          marker.on("mouseover", function (e: { target: { openPopup: () => void } }) {
-            if (pinned) return;
-            e.target.openPopup();
-          });
-          marker.on("mouseout", function (e: { target: { closePopup: () => void } }) {
-            if (pinned) return;
-            e.target.closePopup();
-          });
-          marker.on("click", function (e: { target: { openPopup: () => void; closePopup: () => void } }) {
-            pinned = !pinned;
-            if (pinned) e.target.openPopup();
-            else e.target.closePopup();
-          });
-
-          group.addLayer(marker);
-        });
-      } catch {
-        // silently retry
-      }
-    };
-
-    loadAircraft();
-    const interval = setInterval(loadAircraft, 30000);
-
-    return () => {
-      active = false;
-      clearInterval(interval);
-      group.clearLayers();
-    };
-  }, [showAircraft, mounted]);
-
   if (!mounted) return null;
 
-  const activeCount = [showWeather, showAircraft].filter(Boolean).length;
+  const activeCount = [showWeather].filter(Boolean).length;
 
   return (
     <div className="flex flex-col flex-grow min-h-0">
@@ -638,18 +486,6 @@ export default function GoesMap() {
           >
             <span>🌡️</span>
             Clima
-          </button>
-
-          <button
-            onClick={() => setShowAircraft((v) => !v)}
-            title={showAircraft ? "Ocultar aviones" : "Mostrar aviones en tiempo real"}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono border transition-all ${showAircraft
-                ? "bg-amber-600 text-white border-amber-500 shadow-lg shadow-amber-900/30 ring-1 ring-amber-400/30"
-                : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-200"
-              }`}
-          >
-            <span>✈️</span>
-            Aviones
           </button>
 
         </div>
@@ -696,14 +532,7 @@ export default function GoesMap() {
                 </span>
               </div>
             )}
-            {showAircraft && (
-              <div className="bg-amber-950/90 border border-amber-700 rounded-lg px-3 py-1.5 pointer-events-none">
-                <span className="text-amber-400 text-[11px] font-mono flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse inline-block" />
-                  Aviones en tiempo real · 30s
-                </span>
-              </div>
-            )}
+
 
           </div>
         )}
