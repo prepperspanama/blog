@@ -319,36 +319,80 @@ body {
   border-radius: 0.5rem;
 }
 
+/* ── Table wrapper: horizontal scroll + rounded card ── */
 .prose-prepper table {
   width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-  font-size: 0.9rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 2rem 0;
+  font-size: 0.875rem;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid #3f3f46;
+  border-radius: 0.75rem;
+}
+
+.prose-prepper thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .prose-prepper th {
   background: #18181b;
   color: #22d3ee;
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1.25rem;
   text-align: left;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-family: var(--font-mono), monospace;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   border-bottom: 1px solid #3f3f46;
+  white-space: nowrap;
+}
+
+.prose-prepper th:not(:last-child) {
+  border-right: 1px solid #27272a;
 }
 
 .prose-prepper td {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.25rem;
   border-bottom: 1px solid #27272a;
   color: #d4d4d8;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.prose-prepper td:not(:last-child) {
+  border-right: 1px solid #1f1f23;
 }
 
 .prose-prepper tr:last-child td {
   border-bottom: none;
 }
 
-.prose-prepper tr:hover td {
-  background: rgba(255,255,255,0.02);
+.prose-prepper tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.prose-prepper tbody tr:hover td {
+  background: rgba(6, 182, 212, 0.06);
+  transition: background 0.15s ease;
+}
+
+/* First column: province name — make it stand out */
+.prose-prepper td:first-child {
+  font-weight: 600;
+  color: #f4f4f5;
+  white-space: nowrap;
+}
+
+/* Risk column (middle): styled as a badge-like chip */
+.prose-prepper td:nth-child(2) {
+  color: #67e8f9;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
 }
 
 /* ─────────────────────────────────────────
