@@ -5,24 +5,28 @@ import { ALL_POSTS } from "@/lib/posts"
 const pillars = [
   {
     icon: "📡",
+    label: "Antena",
     title: "Comunicaciones",
     color: "border-cyan-800 bg-cyan-900/10",
     glow: "hover:border-cyan-600 hover:shadow-cyan-900/20",
   },
   {
     icon: "⚡",
+    label: "Rayo",
     title: "Energía",
     color: "border-amber-800/60 bg-amber-900/10",
     glow: "hover:border-amber-600 hover:shadow-amber-900/20",
   },
   {
     icon: "🎒",
+    label: "Mochila",
     title: "Equipo",
     color: "border-emerald-800/60 bg-emerald-900/10",
     glow: "hover:border-emerald-600 hover:shadow-emerald-900/20",
   },
   {
     icon: "🗺️",
+    label: "Mapa",
     title: "Táctica",
     color: "border-violet-800/60 bg-violet-900/10",
     glow: "hover:border-violet-600 hover:shadow-violet-900/20",
@@ -64,7 +68,7 @@ export function PillarsSection() {
               key={p.title}
               className={`border rounded-2xl p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-default text-center flex flex-col items-center justify-center ${p.color} ${p.glow}`}
             >
-              <div className="text-5xl mb-6">{p.icon}</div>
+              <div className="text-5xl mb-6" role="img" aria-label={p.label}>{p.icon}</div>
               <h3 className="text-white font-bold text-xl mb-0">{p.title}</h3>
             </div>
           ))}
@@ -147,11 +151,12 @@ export function CtaSection() {
             agua, comunicación y un plan.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <button
-              className="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-4 rounded-full font-bold transition-all hover:scale-105 shadow-lg shadow-cyan-900/30"
+            <a
+              href="mailto:prepperspanama@proton.me"
+              className="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-4 rounded-full font-bold transition-all hover:scale-105 shadow-lg shadow-cyan-900/30 inline-block"
             >
               Contactar Comunidad
-            </button>
+            </a>
           </div>
         </div>
       </div>

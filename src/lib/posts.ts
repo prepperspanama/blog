@@ -6,6 +6,7 @@ export interface Post {
   excerpt: string;
   category: "Tecnología" | "Equipo" | "Salud" | "Táctica" | "Geografía";
   tags: string[];
+  ogImage?: string;
 }
 
 export const ALL_POSTS: Post[] = [
@@ -28,3 +29,19 @@ export const ALL_POSTS: Post[] = [
     tags: ["Filosofía", "Resiliencia", "Fundamentos"],
   },
 ];
+
+export function getPostsByCategory(category: string) {
+  return ALL_POSTS.filter((p) => p.category === category);
+}
+
+export function getPostsByTag(tag: string) {
+  return ALL_POSTS.filter((p) => p.tags.includes(tag));
+}
+
+export function getAllCategories() {
+  return [...new Set(ALL_POSTS.map((p) => p.category))];
+}
+
+export function getAllTags() {
+  return [...new Set(ALL_POSTS.flatMap((p) => p.tags))];
+}

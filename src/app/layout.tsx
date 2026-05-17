@@ -4,6 +4,9 @@ import Image from "next/image";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import PWARegistration from "@/components/PWARegistration";
+import ReadingProgress from "@/components/ReadingProgress";
+import BackToTop from "@/components/BackToTop";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 import logo from "../../public/logo.webp";
 
 const geistSans = Geist({
@@ -19,11 +22,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Preppers Panamá - Preparación y Supervivencia",
-  description: "Blog sobre preparacionismo, mochilas de emergencia, primeros auxilios y tecnologías de comunicación para situaciones de crisis en Panamá.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} - Preparación y Supervivencia`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
   icons: {
     icon: "/favicon.ico",
     apple: "/logo.webp",
+  },
+  openGraph: {
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    siteName: SITE_NAME,
+    locale: "es_PA",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
+  alternates: {
+    canonical: "/",
   },
 };
 
@@ -55,6 +77,7 @@ export default function RootLayout({
           Saltar al contenido principal
         </a>
         <PWARegistration />
+        <ReadingProgress />
         <Navigation />
         <main id="main-content" className="flex-grow">{children}</main>
         <footer className="bg-zinc-900 border-t border-zinc-800 text-zinc-400 py-12">
@@ -74,6 +97,7 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+        <BackToTop />
       </body>
     </html>
   );

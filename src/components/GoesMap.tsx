@@ -119,13 +119,29 @@ function formatTime(iso: string): string {
   return d.toLocaleTimeString("es-PA", { hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
-const weatherCache: Record<string, CacheEntry> = {};
+const WEATHER_CACHE_KEY = "preppers-weather-cache";
+const WEATHER_CACHE_TTL = 10 * 60 * 1000;
+
+function getWeatherCache(): Record<string, CacheEntry> {
+  try {
+    const raw = localStorage.getItem(WEATHER_CACHE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return {};
+}
+
+function setWeatherCache(cache: Record<string, CacheEntry>) {
+  try {
+    localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify(cache));
+  } catch {}
+}
 
 async function fetchWeatherData(lat: number, lng: number): Promise<OpenMeteoResponse> {
   const key = `${lat},${lng}`;
   const now = Date.now();
-  if (weatherCache[key] && now - weatherCache[key].ts < 10 * 60 * 1000) {
-    return weatherCache[key].data;
+  const cache = getWeatherCache();
+  if (cache[key] && now - cache[key].ts < WEATHER_CACHE_TTL) {
+    return cache[key].data;
   }
   const current = "temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code,precipitation,surface_pressure";
   const daily = "temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code,wind_speed_10m_max,wind_direction_10m_dominant,uv_index_max,sunrise,sunset";
@@ -133,7 +149,8 @@ async function fetchWeatherData(lat: number, lng: number): Promise<OpenMeteoResp
   const res = await fetch(url);
   if (!res.ok) throw new Error("Error al obtener datos climáticos");
   const data: OpenMeteoResponse = await res.json();
-  weatherCache[key] = { data, ts: now };
+  cache[key] = { data, ts: now };
+  setWeatherCache(cache);
   return data;
 }
 
@@ -225,6 +242,7 @@ export default function GoesMap() {
   const [lastUpdate, setLastUpdate] = useState("");
   const [mounted, setMounted] = useState(false);
   const [showWeather, setShowWeather] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -325,6 +343,7 @@ export default function GoesMap() {
         weatherLayerGroupRef.current = L.layerGroup().addTo(map);
       } catch (error) {
         console.error("Error al inicializar el mapa:", error);
+        setMapError("No se pudo cargar el mapa satelital. Verifica tu conexión a internet.");
       }
     };
 
@@ -451,6 +470,24 @@ export default function GoesMap() {
 
   if (!mounted) return null;
 
+  if (mapError) {
+    return (
+      <div className="flex items-center justify-center h-full min-h-[400px] bg-zinc-900">
+        <div className="text-center max-w-md px-4">
+          <div className="text-4xl mb-4">🛰️</div>
+          <p className="text-red-400 font-mono text-sm mb-2">Error de conexión</p>
+          <p className="text-zinc-400 text-sm">{mapError}</p>
+          <button
+            onClick={() => { setMapError(null); setMounted(false); setTimeout(() => setMounted(true), 100); }}
+            className="mt-4 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-mono rounded-lg transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const activeCount = [showWeather].filter(Boolean).length;
 
   return (
@@ -487,7 +524,6 @@ export default function GoesMap() {
             <span>🌡️</span>
             Clima
           </button>
-
         </div>
 
         <div className="flex items-center gap-2 ml-auto">
@@ -532,8 +568,6 @@ export default function GoesMap() {
                 </span>
               </div>
             )}
-
-
           </div>
         )}
 

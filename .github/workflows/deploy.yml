@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -29,11 +29,22 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
       - name: Setup Pages
         uses: actions/configure-pages@v6
 
       - name: Install dependencies
         run: bun install
+
+      - name: Lint
+        run: bun run lint
 
       - name: Build with Next.js
         run: bun run build
